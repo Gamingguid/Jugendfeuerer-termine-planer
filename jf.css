@@ -1,0 +1,85 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to bottom, #fff5f5, #ffeaea);
+  margin: 0;
+  padding: 20px;
+  color: #333;
+}
+
+h1 {
+  text-align: center;
+  color: #b22222;
+  font-size: 2.5em;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  background-color: #fff;
+  border: 2px solid #b22222;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(178, 34, 34, 0.2);
+}
+
+.section {
+  margin-bottom: 30px;
+}
+
+h2 {
+  color: #b22222;
+  margin-bottom: 10px;
+}
+
+input, button {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+}
+
+button {
+  background-color: #b22222;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  background-color: #8b1a1a;
+}
+
+#chatBox {
+  height: 200px;
+  overflow-y: auto;
+  background-color: #fff0f0;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.message {
+  margin-bottom: 5px;
+}
+
+ul {
+  list-style-type: "🔥 ";
+  padding-left: 20px;
+}
+
+#layer1, #createForm, #joinForm, #layer2 {
+  display: none;
+}
+
+#eventNotice {
+  color: #b22222;
+  font-weight: bold;
+  display: none;
+}
+
+
+</body>
+</html>
