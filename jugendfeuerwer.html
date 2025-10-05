@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>🚒 Jugendfeuerwehr Terminplaner</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #fff5f5, #ffeaea);
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #b22222;
+      font-size: 2.5em;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background-color: #fff;
+      border: 2px solid #b22222;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(178, 34, 34, 0.2);
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    h2 {
+      color: #b22222;
+      margin-bottom: 10px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1em;
+    }
+    button {
+      background-color: #b22222;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #8b1a1a;
+    }
+    #chatBox {
+      height: 200px;
+      overflow-y: auto;
+      background-color: #fff0f0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .message {
+      margin-bottom: 5px;
+    }
+    ul {
+      list-style-type: "🔥 ";
+      padding-left: 20px;
+    }
+    #layer1, #createForm, #joinForm, #layer2 {
+      display: none;
+    }
+    #eventNotice {
+      color: #b22222;
+      font-weight: bold;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🚒 Jugendfeuerwehr Terminplaner</h1>
+
+  <div class="container" id="startMenu">
+    <h2>Was möchtest du tun?</h2>
+    <button onclick="showCreate()">🧱 Raum erstellen</button>
+    <button onclick="showJoin()">🚪 Raum beitreten</button>
+  </div>
+
+  <div class="container" id="createForm">
+    <h2>🧱 Raum erstellen</h2>
+    <input type="text" id="usernameCreate" placeholder="Dein Name">
+    <input type="text" id="roomName" placeholder="Name der Jugendfeuerwehr">
+    <button onclick="createRoom()">Raum erstellen</button>
+  </div>
+
+  <div class="container" id="joinForm">
+    <h2>🚪 Raum beitreten</h2>
+    <input type="text" id="usernameJoin" placeholder="Dein Name">
+    <input type="text" id="joinCode" placeholder="Raum-Code eingeben">
+    <button onclick="joinRoom()">Beitreten</button>
+  </div>
+
+  <div class="container" id="layer2">
+    <div><strong>🔐 Raum-Code:</strong> <span id="roomCode"></span></div>
+    <div><strong>👤 Benutzer:</strong> <span id="userDisplay"></span></div>
+    <div><strong>🏠 Raum:</strong> <span id="roomDisplay"></span></div>
+
+    <div class="section">
+      <h2>💬 Chat</h2>
+      <div id="chatBox"></div>
+      <input type="text" id="chatInput" placeholder="Nachricht eingeben...">
+      <button onclick="sendMessage()">Senden</button>
+    </div>
+
+    <div class="section">
+      <h2>📅 Termine</h2>
+      <ul id="eventList"></ul>
+      <input type="text" id="newEvent" placeholder="Neuen Termin eingeben">
+      <button id="addEventBtn" onclick="addEvent()">Termin hinzufügen</button>
+      <div id="eventNotice">❗️Nur der Ersteller kann Termine hinzufügen.</div>
+    </div>
+  </div>
+
+  <script>
+    let rooms = {};
+    let currentRoom = null;
+    let username = "";
+    let isCreator = false;
+    let messages = [];
+    let events = [];
+
+    function showCreate() {
+      document.getElementById("startMenu").style.display = "none";
+      document.getElementById("createForm").style.display = "block";
+    }
+
+    function showJoin() {
+      document.getElementById("startMenu").style.display = "none";
+      document.getElementById("joinForm").style.display = "block";
+    }
+
+    function generateCode() {
+      return Math.random().toString(36).substring(2, 8).toUpperCase();
+    }
+
+    function createRoom() {
+      username = document.getElementById("usernameCreate").value.trim();
+      const name = document.getElementById("roomName").value.trim();
+      if (!username || !name) return alert("Bitte Namen und Raumname eingeben!");
+
+      const code = generateCode();
+      rooms[code] = { name, events: [], messages: [], creator: username };
+      currentRoom = code;
+      isCreator = true;
+      messages = rooms[code].messages;
+      events = rooms[code].events;
+      showLayer2(code, name);
+    }
+
+    function joinRoom() {
+      username = document.getElementById("usernameJoin").value.trim();
+      const code = document.getElementById("joinCode").value.trim().toUpperCase();
+      if (!username || !code) return alert("Bitte Namen und Raumcode eingeben!");
+      if (!rooms[code]) return alert("Raum nicht gefunden!");
+
+      currentRoom = code;
+      isCreator = rooms[code].creator === username;
+      messages = rooms[code].messages;
+      events = rooms[code].events;
+      showLayer2(code, rooms[code].name);
+    }
+
+    function showLayer2(code, name) {
+      document.getElementById("createForm").style.display = "none";
+      document.getElementById("joinForm").style.display = "none";
+      document.getElementById("layer2").style.display = "block";
+      document.getElementById("roomCode").innerText = code;
+      document.getElementById("roomDisplay").innerText = name;
+      document.getElementById("userDisplay").innerText = username;
+
+      document.getElementById("newEvent").style.display = isCreator ? "block" : "none";
+      document.getElementById("addEventBtn").style.display = isCreator ? "block" : "none";
+      document.getElementById("eventNotice").style.display = isCreator ? "none" : "block";
+
+      renderChat();
+      renderEvents();
+    }
+
+    function sendMessage() {
+      const input = document.getElementById("chatInput");
+      const text = input.value.trim();
+      if (!text) return;
+
+      messages.push(`${username}: ${text}`);
+      input.value = "";
+      renderChat();
+    }
+
+    function renderChat() {
+      const box = document.getElementById("chatBox");
+      box.innerHTML = "";
+      messages.forEach(msg => {
+        const div = document.createElement("div");
+        div.className = "message";
+        div.innerText = msg;
+        box.appendChild(div);
+      });
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function addEvent() {
+      if (!isCreator) return alert("Nur der Ersteller kann Termine hinzufügen!");
+
+      const input = document.getElementById("newEvent");
+      const text = input.value.trim();
+      if (!text) return;
+
+      events.push(text);
+      input.value = "";
+      renderEvents();
+    }
+
+    function renderEvents() {
+      const list = document.getElementById("eventList");
+      list.innerHTML = "";
+      events.forEach(ev => {
+        const li = document.createElement("li");
+        li.innerText = ev;
+        list.appendChild(li);
+      });
+    }
+  </script>
+
+</body>
+</html>
+
+
+</body>
+</html>
